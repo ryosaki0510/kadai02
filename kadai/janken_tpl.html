@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<script src="js/jquery-2.1.3.min.js"></script>
+<link rel="stylesheet" href="css/sample.css">
+<title>じゃんけん</title>
+</head>
+<body>
+
+<header>
+  <h1>じゃんけん</h1>
+</header>
+
+<main>
+  <div>【あなた】</div>
+  <div><span id="human_hands">自分が出す手を選んでください</span></div>
+  <ul id="human_gcp">
+    <li id="human_gu_btn" onclick="coladd()">グー</li>
+    <li id="human_cho_btn" onclick="coladd()">チョキ</li>
+    <li id="human_par_btn" onclick="coladd()">パー</li>
+  </ul>
+  <div>【コンピュータ】</div>
+  <div>
+    <span id="pc_hands">
+      コンピュータは、あなたがじゃんけんに参加するのをまっている
+    </span>
+  </div>
+  <div id ="robot_image">
+    <img id="robotIMG" src="image/robot.jpg" alt="ロボットの写真">
+  </div>
+  <div>【勝敗結果】</div>
+  <div id="judgment">勝敗表示</div>
+  <div>【勝敗記録】</div>
+  <ul id="judgment_record"></ul>
+  戦績<input type="button" value="行を追加" id="coladd" onclick="coladd()">          
+  <table id="table" border="1">
+      <tr>
+          <td>
+              出した手
+          </td>
+          <td>
+              結果
+          </td>
+          <td>
+            戦績
+        </td>
+        <td>
+　          削除ボタン
+      </td>
+      </tr>
+  </table>
+</main>
+
+<footer></footer>
+<script>
+      // ボタンを押したら、
+      // コンピュータがランダムに、グー／チョキ／パーを出す
+      // 自分が推した結果と比べて、勝った／あいこ／負けた を出す
+        let click_btn_gcp = "自分の手";
+        let randum_num = null;
+        let com_gcp = "コンピュータの手";
+        let count_judgment = 1;
+        let text_judgment = "";
+        let ul_judgment_record = "";
+        let list_judgment_record = [];
+        let text_judgment_record = "";
+        let count_win = 0;
+        let count_lose = 0;
+        let count_draw = 0;  
+        const gu = "グー";
+        const chi = "チョキ";
+        const pa = "パー";
+        const win = "勝ち";
+        const lose = "負け";
+        const draw = "あいこ";
+
+
+        //自分が押した手
+        //グー
+        $("#human_gu_btn").on("click",function(){
+          click_btn_gcp = gu;
+          judgment(click_btn_gcp,cell1,cell2,cell3,cell4);
+        })
+        //自分が押した手
+        //チョキ
+        $("#human_cho_btn").on("click",function(){
+          click_btn_gcp = chi;
+          judgment(click_btn_gcp,cell1,cell2,cell3,cell4);
+        })
+        //自分が押した手
+        //パー
+        $("#human_par_btn").on("click",function(){
+          click_btn_gcp = pa;
+          judgment(click_btn_gcp,cell1,cell2,cell3,cell4);
+        })
+
+
+  function coladd() {
+        var table = document.getElementById("table");
+        // 行を行末に追加
+        var row = table.insertRow(-1);
+        //td分追加
+        var cell1 = row.insertCell(-1);
+        var cell2 = row.insertCell(-1);
+        var cell3 = row.insertCell(-1);
+        var cell4 = row.insertCell(-1);
+        // セルの内容入力
+        judgment(click_btn_gcp,cell1,cell2,cell3,cell4);
+    }
+
+
+    function judgment(click_btn_gcp,cell1,cell2,cell3,cell4){
+    // &&が”AND" で、||が"OR" で使えそう
+    //コンピュータが手を選ぶ
+    com_select_btn()
+    //自分と相手の手を比べる
+    if(click_btn_gcp == com_gcp){
+      count_draw = count_draw + 1;
+        cell1.innerHTML =  click_btn_gcp;
+        cell2.innerHTML = '引分';
+        cell3.innerHTML = "勝" + count_win + "負" + count_lose + "引分" + count_draw;
+        cell4.innerHTML = 'この行を削除しますか？<input type="button" value=削除" id="coladd" onclick="coldel(this)">';
+        text_judgment = draw;
+    }else if(
+            //勝ち
+            //グー
+              ((click_btn_gcp == gu)&&(com_gcp == chi) )
+              ||
+            //チョキ
+              ((click_btn_gcp == chi)&&(com_gcp == pa))
+              ||
+            //パー
+              ((click_btn_gcp == pa)&&(com_gcp == gu) )
+            ){
+       count_win = count_win + 1;
+       cell1.innerHTML =  click_btn_gcp;
+        cell2.innerHTML = '勝ちました';
+        cell3.innerHTML = "勝" + count_win + "負" + count_lose + "引分" + count_draw;
+        cell4.innerHTML = 'この行を削除しますか？<input type="button" value=削除" id="coladd" onclick="coldel(this)">';
+      text_judgment = win;
+    }else{
+      count_lose = count_lose + 1;
+      cell1.innerHTML =  click_btn_gcp;
+        cell2.innerHTML = '負けました';
+        cell3.innerHTML = "勝" + count_win + "負" + count_lose + "引分" + count_draw;
+        cell4.innerHTML = 'この行を削除しますか？<input type="button" value=削除" id="coladd" onclick="coldel(this)">';
+      text_judgment = lose;
+    }
+    $("#pc_hands").text(com_gcp);
+
+    //コンソールにメモする
+    console.log(click_btn_gcp);
+    console.log(com_gcp);
+
+    //関数_勝敗カウントを呼び出す
+    judgment_record();
+    robot_gcp();
+
+    if(count_judgment == 11){
+      alert("もうやめよう");
+    }else if(count_judgment == 12){
+      alert("なんでやめないの？");
+    }else if(count_judgment == 13){
+      alert("初期化するね");
+      location.reload();
+     }
+  }
+
+  
+  function coldel(obj) {
+        // 削除ボタンを押下された行を取得
+        tr = obj.parentNode.parentNode;
+        // trのインデックスを取得して行を削除する
+        tr.parentNode.deleteRow(tr.sectionRowIndex);
+  }
+
+
+
+  //【関数】
+  // 関数_コンピュータが出す手を呼ぶ
+  function com_select_btn(){
+    randum_num = Math.ceil(Math.random()*3)
+    if(randum_num == 1){
+      //--コンピュータがグー
+      com_gcp = gu;
+    }else if(randum_num == 2){
+      //--コンピュータがチョキ
+      com_gcp = chi;
+    }else{
+      //--コンピュータがパー
+      com_gcp = pa;
+    }
+  }
+
+
+  // 関数_勝敗カウント
+  function judgment_record(){
+    count_judgment = count_judgment + 1;
+
+    // ul要素を取得
+    ul_judgment_record = document.getElementById("judgment_record");
+
+    // li要素を作成
+    list_judgment_record = document.createElement("li");
+
+    // テキスト情報を作成
+    text_judgment_record = document.createTextNode("【"+String(count_judgment-1)+"回目】"+text_judgment+"。あなたの手は"+click_btn_gcp+"でした。");
+
+    // ul要素に追加
+	  list_judgment_record.appendChild(text_judgment_record);
+    ul_judgment_record.prepend(list_judgment_record);
+  }  
+
+  // 関数_ロボットじゃんけん画像入替
+  function robot_gcp(){
+    if(com_gcp == gu){
+      document.getElementById("robotIMG").src="image/gu.jpg";
+    }else if(com_gcp == chi){
+      document.getElementById("robotIMG").src="image/choki.jpg";
+    }else{
+      document.getElementById("robotIMG").src="image/par.jpg";
+    }
+  }  
+</script>
+</body>
+</html>
